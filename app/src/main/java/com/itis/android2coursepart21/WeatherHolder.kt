@@ -56,13 +56,13 @@ class WeatherHolder(
     }
 
     companion object {
-        private const val WEATHER_TOOWARM = 100
-        private const val WEATHER_WARM = 20
+        private const val WEATHER_TOOWARM = 50
+        private const val WEATHER_WARM = 25
         private const val WEATHER_PLUS = 5
         private const val WEATHER_ZERO = 0
         private const val WEATHER_MINUS = -5
-        private const val WEATHER_COLD = -20
-        private const val WEATHER_TOOCOLD = -100
+        private const val WEATHER_COLD = -25
+        private const val WEATHER_TOOCOLD = -50
 
 
         fun create(
