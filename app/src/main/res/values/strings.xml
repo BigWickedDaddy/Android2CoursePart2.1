@@ -1,3 +1,22 @@
 <resources>
-    <string name="app_name">Android2CoursePart2.1</string>
+    <string name="app_name">Weather</string>
+    <string name="city_name">City</string>
+    <string name="city_temperature">25</string>
+    <string name="feels_like">Feels like:</string>
+    <string name="pressure">Pressure:</string>
+    <string name="pressure_value">750 mmHg</string>
+    <string name="wind_speed_value">20 m/s</string>
+    <string name="wind_direction">Wind direction:</string>
+    <string name="wind_speed">Wind speed:</string>
+    <string name="city_search">City search</string>
+    <string name="weather_state">Sunny</string>
+
+    <string name="wind_e">east</string>
+    <string name="wind_se">south-west</string>
+    <string name="wind_s">south</string>
+    <string name="wind_sw">south-east</string>
+    <string name="wind_w">east</string>
+    <string name="wind_nw">north-east</string>
+    <string name="wind_n">north</string>
+    <string name="wind_ne">north-east</string>
 </resources>
