@@ -1,4 +1,4 @@
-package com.itis.android2coursepart21.fragments
+package com.itis.android2coursepart21.presentation.fragments
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -13,11 +13,13 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.snackbar.Snackbar
-import com.itis.android2coursepart21.MainActivity
+import com.itis.android2coursepart21.presentation.MainActivity
 import com.itis.android2coursepart21.R
-import com.itis.android2coursepart21.WeatherAdapter
-import com.itis.android2coursepart21.data.WeatherRepository
+import com.itis.android2coursepart21.presentation.WeatherAdapter
 import com.itis.android2coursepart21.databinding.FragmentMainBinding
+import com.itis.android2coursepart21.domain.usecase.getNearCityUseCase
+import com.itis.android2coursepart21.domain.usecase.getWeatherCityUseCase
+import com.itis.android2coursepart21.domain.usecase.getWeatherIdUseCase
 import kotlinx.coroutines.launch
 
 
@@ -26,14 +28,18 @@ import kotlinx.coroutines.launch
 
 class MainFragment : Fragment(R.layout.fragment_main) {
 
+    private lateinit var getNearCityUseCase: getNearCityUseCase
+    private lateinit var getWeatherCityUseCase: getWeatherCityUseCase
+    private lateinit var getWeatherIdUseCase: getWeatherIdUseCase
+
     private var binding: FragmentMainBinding? = null
     private var latitude: Double? = null
     private var longitude: Double? = null
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
-    private val repository by lazy {
-        WeatherRepository()
-    }
+//    private val repository by lazy {
+//        WeatherRepositoryImpl()
+//    }
 
     @SuppressLint("MissingPermission")
     private val permissionLauncher =
@@ -97,7 +103,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     private fun checkData(city: String?) {
         city?.let {
             lifecycleScope.launch {
-                val weatherResponse = repository.getWeatherCity(city)
+                val weatherResponse =getWeatherCityUseCase(city)
                 if (weatherResponse.cod == HTTP_STATUS_NOT_FOUND){
                     Snackbar.make(
                         requireActivity().findViewById(R.id.container),
@@ -124,7 +130,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     private fun initWeatherAdapter(lat: Double, lon: Double, count: Int) {
         lifecycleScope.launch {
             binding?.rvCities?.apply {
-                adapter = WeatherAdapter(repository.getNearCity(lat, lon, count).list) {
+                adapter = WeatherAdapter(getNearCityUseCase(lat, lon, count).list) {
                     cityFrag(it)
                 }
             }

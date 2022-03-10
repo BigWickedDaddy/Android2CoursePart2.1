@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/MainFragment"
-        android:name="com.itis.android2coursepart21.fragments.MainFragment"
+        android:name="com.itis.android2coursepart21.presentation.fragments.MainFragment"
         android:label="MainFragment" >
         <action
             android:id="@+id/action_mainFragment_to_cityFragment"
@@ -14,7 +14,7 @@
     </fragment>
     <fragment
         android:id="@+id/CityFragment"
-        android:name="com.itis.android2coursepart21.fragments.CityFragment"
+        android:name="com.itis.android2coursepart21.presentation.fragments.CityFragment"
         android:label="CityFragment" >
         <action
             android:id="@+id/action_cityFragment_to_mainFragment"

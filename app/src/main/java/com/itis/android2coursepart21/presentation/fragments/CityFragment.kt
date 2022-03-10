@@ -1,4 +1,4 @@
-package com.itis.android2coursepart21.fragments
+package com.itis.android2coursepart21.presentation.fragments
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -7,22 +7,29 @@ import android.view.View
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import coil.load
-import com.itis.android2coursepart21.MainActivity
+import com.itis.android2coursepart21.presentation.MainActivity
 import com.itis.android2coursepart21.R
-import com.itis.android2coursepart21.data.WeatherRepository
-import com.itis.android2coursepart21.data.api.WeatherResponse
+import com.itis.android2coursepart21.data.WeatherRepositoryImpl
 import com.itis.android2coursepart21.databinding.FragmentCityBinding
+import com.itis.android2coursepart21.domain.entity.Weather
+import com.itis.android2coursepart21.domain.usecase.getNearCityUseCase
+import com.itis.android2coursepart21.domain.usecase.getWeatherCityUseCase
+import com.itis.android2coursepart21.domain.usecase.getWeatherIdUseCase
 import kotlinx.coroutines.launch
 
 class CityFragment : Fragment(R.layout.fragment_city) {
+
+    private lateinit var getNearCityUseCase: getNearCityUseCase
+    private lateinit var getWeatherCityUseCase: getWeatherCityUseCase
+    private lateinit var getWeatherIdUseCase: getWeatherIdUseCase
 
     private var binding: FragmentCityBinding? = null
     private var windDirections: List<String>? = null
     private var id: Int? = null
 
-    private val repository by lazy {
-        WeatherRepository()
-    }
+//    private val repository by lazy {
+//        WeatherRepositoryImpl()
+//    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,20 +59,20 @@ class CityFragment : Fragment(R.layout.fragment_city) {
             getString(R.string.wind_nw)
         )
     }
-
-    private fun initAttrs(weatherResponse: WeatherResponse){
+    //private fun initAttrs(weatherResponse: WeatherResponse){
+    private fun initAttrs(weatherResponse: Weather){
         binding?.apply {
             ivWeatherIcon.load(
-                WeatherRepository.WeatherDataHandler.setImageIconUrl(weatherResponse.weather[0].icon)
+                WeatherRepositoryImpl.WeatherDataHandler.setImageIconUrl(weatherResponse.icon)
             )
-            tvState.text = weatherResponse.weather[0].description
-            tvFeelsLikeState.text = WeatherRepository.WeatherDataHandler.convertTemperature(weatherResponse.main.feelsLike)
-            tvCityTemperature.text = WeatherRepository.WeatherDataHandler.convertTemperature(weatherResponse.main.temp)
-            tvPressureMmhg.text = WeatherRepository.WeatherDataHandler.convertPressure(weatherResponse.main.pressure)
-            tvWindSpeedMs.text = WeatherRepository.WeatherDataHandler.convertWindSpeed(weatherResponse.wind.speed)
+            tvState.text = weatherResponse.description.toString()
+            tvFeelsLikeState.text = WeatherRepositoryImpl.WeatherDataHandler.convertTemperature(weatherResponse.feelsLike)
+            tvCityTemperature.text = WeatherRepositoryImpl.WeatherDataHandler.convertTemperature(weatherResponse.temp)
+            tvPressureMmhg.text = WeatherRepositoryImpl.WeatherDataHandler.convertPressure(weatherResponse.pressure)
+            tvWindSpeedMs.text = WeatherRepositoryImpl.WeatherDataHandler.convertWindSpeed(weatherResponse.speed)
             tvWindDirectionCompass.text = windDirections?.let {
-                WeatherRepository.WeatherDataHandler.convertWindDegree(
-                    weatherResponse.wind.deg,
+                WeatherRepositoryImpl.WeatherDataHandler.convertWindDegree(
+                    weatherResponse.deg,
                     it
                 )
             }
@@ -79,9 +86,10 @@ class CityFragment : Fragment(R.layout.fragment_city) {
 
     private fun setWeatherData(id: Int) {
         lifecycleScope.launch {
-            initAttrs(repository.getWeatherId(id))
+            initAttrs(getWeatherIdUseCase(id))
         }
     }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
@@ -101,4 +109,14 @@ class CityFragment : Fragment(R.layout.fragment_city) {
         binding = null
         super.onDestroyView()
     }
+//
+//    private fun initObjects() {
+//        getNearCityUseCase = getNearCityUseCase(
+//            weatherRepository = WeatherRepositoryImpl(
+//                api = DIContainer.api,
+//                weatherMapper = WeatherMapper()
+//            ),
+//            dispatcher = Dispatchers.Default
+//        )
+//    }
 }

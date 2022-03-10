@@ -1,9 +1,11 @@
 package com.itis.android2coursepart21.data
 
 import com.itis.android2coursepart21.BuildConfig
-import com.itis.android2coursepart21.data.api.NearCity
-import com.itis.android2coursepart21.data.api.WeatherResponse
 import com.itis.android2coursepart21.data.api.api
+import com.itis.android2coursepart21.domain.entity.Weather
+import com.itis.android2coursepart21.domain.repository.WeatherRepository
+import com.itis.android2coursepart21.data.api.mapper.WeatherMapper
+import com.itis.android2coursepart21.domain.entity.NearWeather
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -11,7 +13,9 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import kotlin.math.roundToInt
 
-class WeatherRepository {
+class WeatherRepositoryImpl(
+    private val WeatherMapper: WeatherMapper
+): WeatherRepository {
 
     private val apiKeyInterceptor = Interceptor { chain ->
         val original = chain.request()
@@ -66,19 +70,19 @@ class WeatherRepository {
             .create(com.itis.android2coursepart21.data.api.api::class.java)
     }
 
-    suspend fun getWeatherCity(city: String): WeatherResponse {
-        return api.getWeatherCity(city)
+    override suspend fun getWeatherCity(city: String): Weather {
+        return WeatherMapper.map(api.getWeatherCity(city))
     }
 
-    suspend fun getWeatherId(id: Int): WeatherResponse {
-        return api.getWeatherId(id)
+    override suspend fun getWeatherId(id: Int): Weather {
+        return WeatherMapper.map(api.getWeatherId(id))
     }
 
-    suspend fun getNearCity(
+    override suspend fun getNearCity(
         lat: Double,
         lon: Double,
-        count: Int): NearCity {
-        return api.getNearCity(lat, lon, count)
+        count: Int): NearWeather {
+        return WeatherMapper.mapNear(api.getNearCity(lat, lon, count))
     }
 
 

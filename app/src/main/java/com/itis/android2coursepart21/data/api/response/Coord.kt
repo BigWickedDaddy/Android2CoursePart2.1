@@ -7,5 +7,8 @@ data class Coord(
     @SerializedName("lat")
     val lat: Double,
     @SerializedName("lon")
-    val lon: Double
+    val lon: Double,
+
+    val count: Int,
+    val list: List<NearWeather>,
 )

@@ -1,15 +1,16 @@
-package com.itis.android2coursepart21
+package com.itis.android2coursepart21.presentation
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.itis.android2coursepart21.data.WeatherRepository
+import com.itis.android2coursepart21.data.WeatherRepositoryImpl
 import com.itis.android2coursepart21.data.api.response.NearWeather
 import com.itis.android2coursepart21.databinding.WeatherBinding
 import kotlin.math.roundToInt
 import coil.load
+import com.itis.android2coursepart21.R
 
 
 class WeatherHolder(
@@ -20,11 +21,11 @@ class WeatherHolder(
     fun bind(item: NearWeather) {
         with(binding) {
             tvCityName.text = item.name
-            tvCityTemperatureMain.text = WeatherRepository.WeatherDataHandler.convertTemperature(item.main.temp)
+            tvCityTemperatureMain.text = WeatherRepositoryImpl.WeatherDataHandler.convertTemperature(item.main.temp)
 //            val uri: Uri =
 //                Uri.parse("https://openweathermap.org/img/wn/${detail.weather[0].icon}@2x.png")
             ivImage.load(
-                WeatherRepository.WeatherDataHandler.setImageIconUrl(item.weather[0].icon)
+                WeatherRepositoryImpl.WeatherDataHandler.setImageIconUrl(item.weather[0].icon)
             )
         }
         itemView.setOnClickListener {

@@ -1,4 +1,4 @@
-package com.itis.android2coursepart21
+package com.itis.android2coursepart21.presentation
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView

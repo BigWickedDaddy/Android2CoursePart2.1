@@ -1,9 +1,10 @@
-package com.itis.android2coursepart21
+package com.itis.android2coursepart21.presentation
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import com.itis.android2coursepart21.R
 
 class MainActivity : AppCompatActivity() {
 
