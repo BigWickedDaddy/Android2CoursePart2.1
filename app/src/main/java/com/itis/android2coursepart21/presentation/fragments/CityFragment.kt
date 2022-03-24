@@ -4,17 +4,21 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.MenuItem
 import android.view.View
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import coil.load
+import com.google.android.ads.mediationtestsuite.viewmodels.ViewModelFactory
 import com.itis.android2coursepart21.presentation.MainActivity
 import com.itis.android2coursepart21.R
 import com.itis.android2coursepart21.data.WeatherRepositoryImpl
+import com.itis.android2coursepart21.data.api.mapper.WeatherMapper
 import com.itis.android2coursepart21.databinding.FragmentCityBinding
 import com.itis.android2coursepart21.domain.entity.Weather
 import com.itis.android2coursepart21.domain.usecase.getNearCityUseCase
 import com.itis.android2coursepart21.domain.usecase.getWeatherCityUseCase
 import com.itis.android2coursepart21.domain.usecase.getWeatherIdUseCase
+import com.itis.android2coursepart21.presentation.viewmodels.CityViewModel
 import kotlinx.coroutines.launch
 
 class CityFragment : Fragment(R.layout.fragment_city) {
@@ -23,8 +27,11 @@ class CityFragment : Fragment(R.layout.fragment_city) {
     private lateinit var getWeatherCityUseCase: getWeatherCityUseCase
     private lateinit var getWeatherIdUseCase: getWeatherIdUseCase
 
-    private var binding: FragmentCityBinding? = null
+    private lateinit var binding: FragmentCityBinding
+    private lateinit var viewModel: CityViewModel
     private var windDirections: List<String>? = null
+    //    private var binding: FragmentCityBinding? = null
+//    private var windDirections: List<String>? = null
     private var id: Int? = null
 
 //    private val repository by lazy {
@@ -48,6 +55,10 @@ class CityFragment : Fragment(R.layout.fragment_city) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentCityBinding.bind(view)
+
+        initObjects()
+        initObservers()
+
         windDirections = listOf(
             getString(R.string.wind_n),
             getString(R.string.wind_ne),
@@ -56,9 +67,26 @@ class CityFragment : Fragment(R.layout.fragment_city) {
             getString(R.string.wind_s),
             getString(R.string.wind_sw),
             getString(R.string.wind_w),
-            getString(R.string.wind_nw)
+            getString(R.string.wind_nw),
         )
     }
+
+    private fun initObjects() {
+        val weatherRepository = WeatherRepositoryImpl(WeatherMapper())
+
+        val factory = ViewModelFactory(
+            getNearCityUseCase(WeatherRepositoryImpl(WeatherMapper())),
+            getWeatherCityUseCase(WeatherRepositoryImpl(WeatherMapper())),
+            getWeatherIdUseCase(WeatherRepositoryImpl(WeatherMapper())),
+        )
+
+        viewModel = ViewModelProvider(
+            this,
+            factory
+        )[CityViewModel::class.java]
+    }
+
+
     //private fun initAttrs(weatherResponse: WeatherResponse){
     private fun initAttrs(weatherResponse: Weather){
         binding?.apply {
@@ -105,10 +133,6 @@ class CityFragment : Fragment(R.layout.fragment_city) {
         findNavController().navigateUp()
     }
 
-    override fun onDestroyView() {
-        binding = null
-        super.onDestroyView()
-    }
 //
 //    private fun initObjects() {
 //        getNearCityUseCase = getNearCityUseCase(

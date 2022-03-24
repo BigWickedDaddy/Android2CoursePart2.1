@@ -3,23 +3,30 @@ package com.itis.android2coursepart21.presentation.fragments
 import android.Manifest
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.SearchView
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
+import com.google.android.ads.mediationtestsuite.viewmodels.ViewModelFactory
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.snackbar.Snackbar
 import com.itis.android2coursepart21.presentation.MainActivity
 import com.itis.android2coursepart21.R
+import com.itis.android2coursepart21.data.WeatherRepositoryImpl
+import com.itis.android2coursepart21.data.api.mapper.WeatherMapper
+import com.itis.android2coursepart21.data.api.response.Coord
 import com.itis.android2coursepart21.presentation.WeatherAdapter
 import com.itis.android2coursepart21.databinding.FragmentMainBinding
 import com.itis.android2coursepart21.domain.usecase.getNearCityUseCase
 import com.itis.android2coursepart21.domain.usecase.getWeatherCityUseCase
 import com.itis.android2coursepart21.domain.usecase.getWeatherIdUseCase
+import com.itis.android2coursepart21.presentation.viewmodels.CityViewModel
 import kotlinx.coroutines.launch
 
 
@@ -28,14 +35,15 @@ import kotlinx.coroutines.launch
 
 class MainFragment : Fragment(R.layout.fragment_main) {
 
-    private lateinit var getNearCityUseCase: getNearCityUseCase
-    private lateinit var getWeatherCityUseCase: getWeatherCityUseCase
-    private lateinit var getWeatherIdUseCase: getWeatherIdUseCase
+//    private lateinit var getNearCityUseCase: getNearCityUseCase
+//    private lateinit var getWeatherCityUseCase: getWeatherCityUseCase
+//    private lateinit var getWeatherIdUseCase: getWeatherIdUseCase
 
     private var binding: FragmentMainBinding? = null
     private var latitude: Double? = null
     private var longitude: Double? = null
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var coordinates: Coord
 
 //    private val repository by lazy {
 //        WeatherRepositoryImpl()
@@ -59,6 +67,20 @@ class MainFragment : Fragment(R.layout.fragment_main) {
                 }
             }
         }
+    private fun initObjects() {
+        val weatherRepository = WeatherRepositoryImpl(WeatherMapper())
+
+        val factory = ViewModelFactory(
+            getNearCityUseCase(WeatherRepositoryImpl(WeatherMapper())),
+            getWeatherCityUseCase(WeatherRepositoryImpl(WeatherMapper())),
+            getWeatherIdUseCase(WeatherRepositoryImpl(WeatherMapper())),
+        )
+
+        viewModel = ViewModelProvider(
+            this,
+            factory
+        )[CityViewModel::class.java]
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,6 +97,8 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentMainBinding.bind(view)
 
+        initObjects()
+        initObservers()
 
         (activity as MainActivity).supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(false)
@@ -98,7 +122,47 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     }
 
 
+    private fun initObservers() {
+        viewModel.weatherDetail.observe(viewLifecycleOwner) {
+            it.fold(onSuccess = { weatherData ->
+                val bundle = Bundle().apply {
+                    putInt("ARG_CITY_ID", id)
+                }
+                val options = NavOptions.Builder()
+                    .build()
 
+                findNavController().navigate(
+                    R.id.action_mainFragment_to_cityFragment,
+                    bundle,
+                    options
+                )
+            }, onFailure = {
+                Snackbar.make(
+                    requireActivity().findViewById(R.id.container),
+                    "No data",
+                    Snackbar.LENGTH_LONG
+                ).show()
+            })
+        }
+        viewModel.weatherList.observe(viewLifecycleOwner) {
+            it.fold(onSuccess = { result ->
+                WeatherAdapter.submitList(result)
+            }, onFailure = {
+                Snackbar.make(
+                    requireActivity().findViewById(R.id.container),
+                    "No data",
+                    Snackbar.LENGTH_LONG
+                ).show()
+            })
+        }
+        viewModel.location.observe(viewLifecycleOwner) {
+            it.fold(onSuccess = { result ->
+                coordinates = result
+            }, onFailure = {
+                Log.e("Location", "No data(location)")
+            })
+        }
+    }
 
     private fun checkData(city: String?) {
         city?.let {
@@ -115,6 +179,8 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             }
         }
     }
+
+
 
 
     private fun lastLocation() {
