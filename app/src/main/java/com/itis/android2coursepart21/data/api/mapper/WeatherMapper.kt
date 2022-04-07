@@ -33,11 +33,5 @@ class WeatherMapper {
         cnt = response.count,
         list = response.list,
     )
-    fun mapWeatherNear(response: NearCity):WeatherNearCity = WeatherNearCity(
-        cod =response.cod,
-        count = response.count,
-//        list = response.list,
-        message = response.message,
-    )
 
 }

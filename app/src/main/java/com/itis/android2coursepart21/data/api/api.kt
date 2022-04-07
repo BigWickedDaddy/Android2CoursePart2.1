@@ -11,19 +11,11 @@ interface api {
     suspend fun getNearCity(@Query("lon") longitude: Double,
                             @Query("lat") latitude: Double,
                             @Query("cnt") count: Int): Coord
-    @GET("find")
-    suspend fun getNearCityOne(@Query("lon") longitude: Double,
-                               @Query("lat") latitude: Double,
-                               @Query("cnt") count: Int): NearCity
-
 
     @GET("weather")
     suspend fun getWeatherCity(@Query("q") city: String): WeatherResponse
 
     @GET("weather")
-    suspend fun getWeatherByCoordinates(@Query("lat") latitude: Double, @Query("lon") longitude:Double
-    ): WeatherResponse
-
-    @GET("weather")
     suspend fun getWeatherId(@Query("id") id: Int): WeatherResponse
+
 }

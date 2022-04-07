@@ -11,20 +11,24 @@ import com.itis.android2coursepart21.domain.usecase.getNearCityUseCase
 import com.itis.android2coursepart21.domain.usecase.getWeatherCityUseCase
 import com.itis.android2coursepart21.domain.usecase.getWeatherIdUseCase
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
-class MainViewModel(
-    private lateinit var getNearCityUseCase: getNearCityUseCase,
-    private lateinit var getWeatherCityUseCase: getWeatherCityUseCase,
-    private lateinit var getWeatherIdUseCase: getWeatherIdUseCase
+class MainViewModel @Inject constructor(
+    private var getNearCityUseCase: getNearCityUseCase,
+    private var getWeatherCityUseCase: getWeatherCityUseCase,
+    private var getWeatherIdUseCase: getWeatherIdUseCase
 ) : ViewModel() {
 
     private var _weather: MutableLiveData<Result<Weather>> = MutableLiveData()
     val weatherDetail: LiveData<Result<Weather>> = _weather
+
     private var _weathernearcity: MutableLiveData<Result<Coord>> = MutableLiveData()
     val weathernearcity: LiveData<Result<Coord>> = _weathernearcity
+
     private var _nearweather: MutableLiveData<Result<MutableList<NearWeather>>> = MutableLiveData()
     val weatherList: LiveData<Result<MutableList<NearWeather>>> = _nearweather
+
 
     fun getNearCity(lat: Double,
                     lon: Double,
@@ -32,7 +36,7 @@ class MainViewModel(
         viewModelScope.launch {
             try {
                 val weatherList = getNearCityUseCase(lat, lon , count)
-                _nearweather.value = Result.success(_nearweather)
+                _nearweather.value = Result.success(weatherList)
             } catch (ex: Exception) {
                 _nearweather.value = Result.failure(ex)
             }
@@ -43,7 +47,7 @@ class MainViewModel(
         viewModelScope.launch {
             try {
                 val weatherTest =
-                    com.itis.android2coursepart21.domain.usecase.getWeatherCityUseCase(city)
+                    getWeatherCityUseCase(city)
                 _weather.value = Result.success(weatherTest)
             } catch (ex: Exception) {
                 _weather.value = Result.failure(ex)

@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.SearchView
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavOptions
@@ -16,6 +17,7 @@ import com.google.android.ads.mediationtestsuite.viewmodels.ViewModelFactory
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.snackbar.Snackbar
+import com.itis.android2coursepart21.App
 import com.itis.android2coursepart21.presentation.MainActivity
 import com.itis.android2coursepart21.R
 import com.itis.android2coursepart21.data.WeatherRepositoryImpl
@@ -27,17 +29,12 @@ import com.itis.android2coursepart21.domain.usecase.getNearCityUseCase
 import com.itis.android2coursepart21.domain.usecase.getWeatherCityUseCase
 import com.itis.android2coursepart21.domain.usecase.getWeatherIdUseCase
 import com.itis.android2coursepart21.presentation.viewmodels.CityViewModel
+import com.itis.android2coursepart21.presentation.viewmodels.MainViewModel
 import kotlinx.coroutines.launch
-
-
-
+import javax.inject.Inject
 
 
 class MainFragment : Fragment(R.layout.fragment_main) {
-
-//    private lateinit var getNearCityUseCase: getNearCityUseCase
-//    private lateinit var getWeatherCityUseCase: getWeatherCityUseCase
-//    private lateinit var getWeatherIdUseCase: getWeatherIdUseCase
 
     private var binding: FragmentMainBinding? = null
     private var latitude: Double? = null
@@ -45,9 +42,12 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var coordinates: Coord
 
-//    private val repository by lazy {
-//        WeatherRepositoryImpl()
-//    }
+    @Inject
+    lateinit var factory: ViewModelProvider.Factory
+
+    private val viewModel: MainViewModel by viewModels {
+        factory
+    }
 
     @SuppressLint("MissingPermission")
     private val permissionLauncher =
@@ -67,23 +67,12 @@ class MainFragment : Fragment(R.layout.fragment_main) {
                 }
             }
         }
-    private fun initObjects() {
-        val weatherRepository = WeatherRepositoryImpl(WeatherMapper())
 
-        val factory = ViewModelFactory(
-            getNearCityUseCase(WeatherRepositoryImpl(WeatherMapper())),
-            getWeatherCityUseCase(WeatherRepositoryImpl(WeatherMapper())),
-            getWeatherIdUseCase(WeatherRepositoryImpl(WeatherMapper())),
-        )
-
-        viewModel = ViewModelProvider(
-            this,
-            factory
-        )[CityViewModel::class.java]
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        (activity?.application as App).appComponent.inject(this)
+
         setHasOptionsMenu(false)
 
         context?.let {
@@ -97,7 +86,6 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentMainBinding.bind(view)
 
-        initObjects()
         initObservers()
 
         (activity as MainActivity).supportActionBar?.apply {
@@ -155,7 +143,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
                 ).show()
             })
         }
-        viewModel.location.observe(viewLifecycleOwner) {
+        viewModel.weathernearcity.observe(viewLifecycleOwner) {
             it.fold(onSuccess = { result ->
                 coordinates = result
             }, onFailure = {

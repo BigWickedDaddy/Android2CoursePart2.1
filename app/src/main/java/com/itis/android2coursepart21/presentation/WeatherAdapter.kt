@@ -3,6 +3,7 @@ package com.itis.android2coursepart21.presentation
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.itis.android2coursepart21.data.api.response.NearWeather
+import com.itis.android2coursepart21.domain.entity.Weather
 
 class WeatherAdapter(
     private val list: List<NearWeather>,
@@ -20,4 +21,10 @@ class WeatherAdapter(
         holder.bind(list[position])
     }
 
+    override fun submitList(list: MutableList<Weather>?) {
+        super.submitList(
+            if (list == null) null
+            else ArrayList(list)
+        )
+    }
 }

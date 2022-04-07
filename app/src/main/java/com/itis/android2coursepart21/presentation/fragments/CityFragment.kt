@@ -4,11 +4,14 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.MenuItem
 import android.view.View
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import coil.load
 import com.google.android.ads.mediationtestsuite.viewmodels.ViewModelFactory
+import com.google.android.material.snackbar.Snackbar
+import com.itis.android2coursepart21.App
 import com.itis.android2coursepart21.presentation.MainActivity
 import com.itis.android2coursepart21.R
 import com.itis.android2coursepart21.data.WeatherRepositoryImpl
@@ -20,26 +23,35 @@ import com.itis.android2coursepart21.domain.usecase.getWeatherCityUseCase
 import com.itis.android2coursepart21.domain.usecase.getWeatherIdUseCase
 import com.itis.android2coursepart21.presentation.viewmodels.CityViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import org.koin.test.inject
+
 
 class CityFragment : Fragment(R.layout.fragment_city) {
+
+    @Inject
+    lateinit var factory: ViewModelProvider.Factory
 
     private lateinit var getNearCityUseCase: getNearCityUseCase
     private lateinit var getWeatherCityUseCase: getWeatherCityUseCase
     private lateinit var getWeatherIdUseCase: getWeatherIdUseCase
 
     private lateinit var binding: FragmentCityBinding
-    private lateinit var viewModel: CityViewModel
     private var windDirections: List<String>? = null
-    //    private var binding: FragmentCityBinding? = null
-//    private var windDirections: List<String>? = null
+
     private var id: Int? = null
 
-//    private val repository by lazy {
-//        WeatherRepositoryImpl()
-//    }
+
+    private val viewModel: CityViewModel by viewModels {
+        factory
+    }
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        (activity?.application as App).appComponent.inject(this)
+
         setHasOptionsMenu(true)
         (activity as MainActivity).supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
@@ -56,7 +68,6 @@ class CityFragment : Fragment(R.layout.fragment_city) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentCityBinding.bind(view)
 
-        initObjects()
         initObservers()
 
         windDirections = listOf(
@@ -71,23 +82,21 @@ class CityFragment : Fragment(R.layout.fragment_city) {
         )
     }
 
-    private fun initObjects() {
-        val weatherRepository = WeatherRepositoryImpl(WeatherMapper())
 
-        val factory = ViewModelFactory(
-            getNearCityUseCase(WeatherRepositoryImpl(WeatherMapper())),
-            getWeatherCityUseCase(WeatherRepositoryImpl(WeatherMapper())),
-            getWeatherIdUseCase(WeatherRepositoryImpl(WeatherMapper())),
-        )
-
-        viewModel = ViewModelProvider(
-            this,
-            factory
-        )[CityViewModel::class.java]
+    private fun initObservers() {
+        viewModel.weatherDetail.observe(viewLifecycleOwner) {
+            it.fold(onSuccess = { weatherData ->
+                initAttrs(weatherData)
+            }, onFailure = {
+                Snackbar.make(
+                    requireActivity().findViewById(R.id.container),
+                    "Ошибка отображения",
+                    Snackbar.LENGTH_LONG
+                ).show()
+            })
+        }
     }
 
-
-    //private fun initAttrs(weatherResponse: WeatherResponse){
     private fun initAttrs(weatherResponse: Weather){
         binding?.apply {
             ivWeatherIcon.load(
@@ -133,14 +142,4 @@ class CityFragment : Fragment(R.layout.fragment_city) {
         findNavController().navigateUp()
     }
 
-//
-//    private fun initObjects() {
-//        getNearCityUseCase = getNearCityUseCase(
-//            weatherRepository = WeatherRepositoryImpl(
-//                api = DIContainer.api,
-//                weatherMapper = WeatherMapper()
-//            ),
-//            dispatcher = Dispatchers.Default
-//        )
-//    }
 }
