@@ -10,10 +10,12 @@ import com.itis.android2coursepart21.domain.entity.Weather
 import com.itis.android2coursepart21.domain.usecase.getNearCityUseCase
 import com.itis.android2coursepart21.domain.usecase.getWeatherCityUseCase
 import com.itis.android2coursepart21.domain.usecase.getWeatherIdUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
+@HiltViewModel
 class MainViewModel @Inject constructor(
     private var getNearCityUseCase: getNearCityUseCase,
     private var getWeatherCityUseCase: getWeatherCityUseCase,
@@ -28,7 +30,6 @@ class MainViewModel @Inject constructor(
 
     private var _nearweather: MutableLiveData<Result<MutableList<NearWeather>>> = MutableLiveData()
     val weatherList: LiveData<Result<MutableList<NearWeather>>> = _nearweather
-
 
     fun getNearCity(lat: Double,
                     lon: Double,

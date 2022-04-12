@@ -1,5 +1,6 @@
 package com.itis.android2coursepart21.data
 
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.itis.android2coursepart21.BuildConfig
 import com.itis.android2coursepart21.data.api.api
 import com.itis.android2coursepart21.domain.entity.Weather
@@ -17,60 +18,9 @@ import kotlin.math.roundToInt
 class WeatherRepositoryImpl @Inject constructor(
     private val api: Api,
     private val WeatherMapper: WeatherMapper
+    private val fusedLocationProviderClient: FusedLocationProviderClient
 ): WeatherRepository {
 
-//    private val apiKeyInterceptor = Interceptor { chain ->
-//        val original = chain.request()
-//        val newURL = original.url.newBuilder()
-//            .addQueryParameter(QUERY_API_KEY, API_KEY)
-//            .build()
-//
-//        chain.proceed(
-//            original.newBuilder()
-//                .url(newURL)
-//                .build()
-//        )
-//    }
-//
-//    private val apiUnitsInterceptor = Interceptor { chain ->
-//        val original = chain.request()
-//        val newURL = original.url.newBuilder()
-//            .addQueryParameter(QUERY_UNITS_VALUE, API_UNITS)
-//            .addQueryParameter(QUERY_LOCALE_VALUE, API_LOCALE)
-//            .build()
-//
-//        chain.proceed(
-//            original.newBuilder()
-//                .url(newURL)
-//                .build()
-//        )
-//    }
-//
-//    private val okhttp: OkHttpClient by lazy {
-//        OkHttpClient.Builder()
-//            .addInterceptor(apiUnitsInterceptor)
-//            .addInterceptor(apiKeyInterceptor)
-//            .also {
-//                if (BuildConfig.DEBUG) {
-//                    it.addInterceptor(
-//                        HttpLoggingInterceptor()
-//                            .setLevel(
-//                                HttpLoggingInterceptor.Level.BODY
-//                            )
-//                    )
-//                }
-//            }
-//            .build()
-//    }
-//
-//    private val api: api by lazy {
-//        Retrofit.Builder()
-//            .client(okhttp)
-//            .baseUrl(BASE_URL)
-//            .addConverterFactory(GsonConverterFactory.create())
-//            .build()
-//            .create(com.itis.android2coursepart21.data.api.api::class.java)
-//    }
 
     override suspend fun getWeatherCity(city: String): Weather {
         return WeatherMapper.map(api.getWeatherCity(city))

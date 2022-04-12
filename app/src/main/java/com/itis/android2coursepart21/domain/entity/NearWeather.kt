@@ -7,7 +7,4 @@ data class NearWeather(
     val lon: Double,
     val cnt: Int,
     val list: List<NearWeather>
-
-//    val list: List<NearWeather>,
-) {
-}
+)

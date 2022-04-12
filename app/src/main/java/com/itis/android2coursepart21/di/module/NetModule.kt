@@ -8,6 +8,8 @@ import com.itis.android2coursepart21.di.qualifier.ApiUnitsInterceptor
 import com.itis.android2coursepart21.di.qualifier.LoggingInterceptor
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -29,6 +31,7 @@ private const val QUERY_LOCALE_VALUE = "lang"
 private const val DEGREE_UNIT_UNICODE = "\u2103"
 
 @Module
+@InstallIn(SingletonComponent::class)
 class NetModule {
 
     @Provides

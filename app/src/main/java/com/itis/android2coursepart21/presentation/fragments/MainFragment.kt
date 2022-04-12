@@ -30,10 +30,11 @@ import com.itis.android2coursepart21.domain.usecase.getWeatherCityUseCase
 import com.itis.android2coursepart21.domain.usecase.getWeatherIdUseCase
 import com.itis.android2coursepart21.presentation.viewmodels.CityViewModel
 import com.itis.android2coursepart21.presentation.viewmodels.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class MainFragment : Fragment(R.layout.fragment_main) {
 
     private var binding: FragmentMainBinding? = null
@@ -42,12 +43,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var coordinates: Coord
 
-    @Inject
-    lateinit var factory: ViewModelProvider.Factory
-
-    private val viewModel: MainViewModel by viewModels {
-        factory
-    }
+    private val viewModel: MainViewModel by viewModels()
 
     @SuppressLint("MissingPermission")
     private val permissionLauncher =
@@ -71,8 +67,6 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (activity?.application as App).appComponent.inject(this)
-
         setHasOptionsMenu(false)
 
         context?.let {
@@ -168,9 +162,6 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         }
     }
 
-
-
-
     private fun lastLocation() {
         permissionLauncher.launch(
             arrayOf(
@@ -179,7 +170,6 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             )
         )
     }
-
 
     private fun initWeatherAdapter(lat: Double, lon: Double, count: Int) {
         lifecycleScope.launch {
@@ -190,7 +180,6 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             }
         }
     }
-
 
     private fun cityFrag(id: Int) {
         val bundle = Bundle().apply {
@@ -224,6 +213,4 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         private const val HTTP_STATUS_NOT_FOUND = 404
 
     }
-
-
 }

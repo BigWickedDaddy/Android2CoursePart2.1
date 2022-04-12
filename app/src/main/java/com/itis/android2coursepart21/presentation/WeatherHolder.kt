@@ -22,8 +22,6 @@ class WeatherHolder(
         with(binding) {
             tvCityName.text = item.name
             tvCityTemperatureMain.text = WeatherRepositoryImpl.WeatherDataHandler.convertTemperature(item.main.temp)
-//            val uri: Uri =
-//                Uri.parse("https://openweathermap.org/img/wn/${detail.weather[0].icon}@2x.png")
             ivImage.load(
                 WeatherRepositoryImpl.WeatherDataHandler.setImageIconUrl(item.weather[0].icon)
             )
@@ -64,7 +62,6 @@ class WeatherHolder(
         private const val WEATHER_MINUS = -5
         private const val WEATHER_COLD = -25
         private const val WEATHER_TOOCOLD = -50
-
 
         fun create(
             parent: ViewGroup,

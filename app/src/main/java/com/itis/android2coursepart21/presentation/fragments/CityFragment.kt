@@ -22,15 +22,12 @@ import com.itis.android2coursepart21.domain.usecase.getNearCityUseCase
 import com.itis.android2coursepart21.domain.usecase.getWeatherCityUseCase
 import com.itis.android2coursepart21.domain.usecase.getWeatherIdUseCase
 import com.itis.android2coursepart21.presentation.viewmodels.CityViewModel
+import com.itis.android2coursepart21.presentation.viewmodels.CityViewModel.Companion.provideFactory
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import org.koin.test.inject
 
 
 class CityFragment : Fragment(R.layout.fragment_city) {
-
-    @Inject
-    lateinit var factory: ViewModelProvider.Factory
 
     private lateinit var getNearCityUseCase: getNearCityUseCase
     private lateinit var getWeatherCityUseCase: getWeatherCityUseCase
@@ -39,19 +36,19 @@ class CityFragment : Fragment(R.layout.fragment_city) {
     private lateinit var binding: FragmentCityBinding
     private var windDirections: List<String>? = null
 
-    private var id: Int? = null
-
-
-    private val viewModel: CityViewModel by viewModels {
-        factory
+    @Inject
+    lateinit var factory: CityViewModel.Factory
+    private val cityId: Int by lazy {
+        arguments?.getInt("ARG_CITY_ID") ?: -1
+    }
+    private val viewModel: CityViewModel by viewModels{
+        CityViewModel.provideFactory(factory, cityId)
     }
 
-
+    private var id: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (activity?.application as App).appComponent.inject(this)
-
         setHasOptionsMenu(true)
         (activity as MainActivity).supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
@@ -81,7 +78,6 @@ class CityFragment : Fragment(R.layout.fragment_city) {
             getString(R.string.wind_nw),
         )
     }
-
 
     private fun initObservers() {
         viewModel.weatherDetail.observe(viewLifecycleOwner) {
@@ -126,7 +122,6 @@ class CityFragment : Fragment(R.layout.fragment_city) {
             initAttrs(getWeatherIdUseCase(id))
         }
     }
-
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
